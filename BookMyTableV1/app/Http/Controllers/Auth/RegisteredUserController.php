@@ -37,7 +37,7 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'username' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
@@ -50,7 +50,7 @@ class RegisteredUserController extends Controller
         if ($user->role === 'restaurateur') {
             return redirect(route('restaurateur.dashboard', absolute: false));
         } elseif ($user->role === 'client') {
-            return redirect(route('client.home', absolute: false));
+            return redirect(route('home', absolute: false));
         } elseif ($user->role === 'admin') {
             return redirect(route('admin.restaurants', absolute: false));
         }
