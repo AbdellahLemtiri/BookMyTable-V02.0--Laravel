@@ -61,5 +61,5 @@ class RestuarateurConteroller extends Controller
     public function destroy(string $id)
     {
         //
-    }
+    } 
 }
