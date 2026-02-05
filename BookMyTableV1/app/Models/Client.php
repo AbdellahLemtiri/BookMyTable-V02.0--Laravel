@@ -18,7 +18,7 @@ class Client extends User
         'avatar',
     ];
 
-    public function restaurants()
+    public function restaurants() 
     {
         return  $this->belongsToMany(Restaurant::class, 'favoris', 'user_id', 'restaurant_id')->withTimestamps();
     }
