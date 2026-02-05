@@ -14,3 +14,4 @@ class Photo extends Model
         return $this->belongsTo(Restaurant::class, 'restaurant_id');
     }
 }
+ 
