@@ -21,7 +21,7 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         if(Role::findByName('client')->users()->where('id', Auth::id())->exists()){
-            $user = Cli
+            // $user = Cli
         }
         if(Role::findByName('restaurateur')->users()->where('id', Auth::id())->exists()){
             $user =  Restaurateur::find(Auth::id()); 
