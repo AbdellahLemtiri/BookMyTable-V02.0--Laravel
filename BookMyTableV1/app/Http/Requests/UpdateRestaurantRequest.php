@@ -22,7 +22,7 @@ class UpdateRestaurantRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            // 
         ];
     }
 }
