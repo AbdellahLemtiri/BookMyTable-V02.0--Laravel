@@ -16,7 +16,7 @@ class Menu extends Model
         return $this->belongsTo(Restaurant::class);
     }
 
-    public function plats()
+    public function plats() 
     {
         return $this->hasMany(Plat::class);
     }
