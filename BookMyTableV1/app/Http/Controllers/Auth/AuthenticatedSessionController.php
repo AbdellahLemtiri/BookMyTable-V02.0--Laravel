@@ -8,16 +8,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use App\Models\User;
-use Spatie\Permission\Traits\HasRoles;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Display the login view.
      */
-       use   HasRoles;
-
     public function create(): View
     {
         return view('auth.login');
@@ -28,20 +24,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-
- 
         $request->authenticate();
 
         $request->session()->regenerate();
-        $user = $request->user();
-
-        if ($user->hasRole('admin')) {
-            return redirect()->intended(route('home'));
-        }
-
-        if ($user->hasRole('restaurateur')) {
-            return redirect()->intended(route('home'));
-        }
 
         return redirect()->intended(route('home', absolute: false));
     }

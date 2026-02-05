@@ -3,74 +3,75 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Reset Cached Permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // 2. Créer les Permissions (Actions possibles)
-        $permissions = [
-            // Gestion Restaurants
-            'create restaurant',
-            'edit own restaurant',
-            'delete own restaurant',
-            'delete any restaurant',  
-            
-            'manage menu',
-             
-            'book table',
-            'manage bookings', 
-           
-            'write review',
-            'manage reviews', 
-            
-            'access dashboard',
-            'manage users',
-        ];
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+        // Communes
+        Permission::firstOrCreate(['name' => 'modifier profil']);
+
+        // Client
+        Permission::firstOrCreate(['name' => 'rechercher restaurants']);
+        Permission::firstOrCreate(['name' => 'consulter details restaurant']);
+        Permission::firstOrCreate(['name' => 'ajouter favoris']);
+        Permission::firstOrCreate(['name' => 'reserver table']);
+
+        // Restaurateur
+        Permission::firstOrCreate(['name' => 'creer restaurant']);
+        Permission::firstOrCreate(['name' => 'modifier propre restaurant']);
+        Permission::firstOrCreate(['name' => 'supprimer propre restaurant']);
+        Permission::firstOrCreate(['name' => 'gerer menus']);
+        Permission::firstOrCreate(['name' => 'gerer plats']);
+
+        // Admin
+        Permission::firstOrCreate(['name' => 'supprimer nimporte quel restaurant']);
+        Permission::firstOrCreate(['name' => 'acceder dashboard admin']);
+        Permission::firstOrCreate(['name' => 'gerer utilisateurs']);
+        Permission::firstOrCreate(['name' => 'gerer roles']);
+        Permission::firstOrCreate(['name' => 'gerer permissions']);
+        // visiteur
+        Permission::firstOrCreate(['name' => 'login']);
+
+
+
+
+        // --- ROLES ---
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $restaurateur = Role::firstOrCreate(['name' => 'restaurateur']);
+        $client = Role::firstOrCreate(['name' => 'client']);
+        $visiteur = Role::firstOrCreate(['name' => 'visiteur']);
+
+        // Admin :  
+        $admin->givePermissionTo(Permission::all());
+
+        // Restaurateur
+        $restaurateur->givePermissionTo([
+            'modifier profil',
+            'creer restaurant',
+            'modifier propre restaurant',
+            'supprimer propre restaurant',
+            'gerer menus'
+        ]);
+
+        // Client
+        $client->givePermissionTo([
+            'modifier profil',
+            'rechercher restaurants',
+            'consulter details restaurant',
+            'ajouter favoris',
+            'reserver table'
+        ]);
+
+        // Visiteur
+        $visiteur->givePermissionTo([
+            'login'
+        ]);
         }
- 
-        $clientRole = Role::create(['name' => 'client']);
-        $clientRole->givePermissionTo([
-            'book table',
-            'write review',
-        ]);
- 
-        $restaurateurRole = Role::create(['name' => 'restaurateur']);
-        $restaurateurRole->givePermissionTo([
-            'create restaurant',
-            'edit own restaurant',
-            'delete own restaurant',
-            'manage menu',
-            'manage bookings',
-            'access dashboard',  
-        ]);
-
-    
-        $adminRole = Role::create(['name' => 'admin']);
-        $adminRole->givePermissionTo(Permission::all());  
- 
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@bookmytable.com',
-            'password' => Hash::make('password123'),
-        ]);
-        $admin->assignRole('admin');
-         
-        $restoUser = User::create([
-            'name' => 'Chef Ramsay',
-            'email' => 'chef@kitchen.com',
-            'password' => Hash::make('password123'),
-        ]);
-        $restoUser->assignRole('restaurateur');
-    }
 }

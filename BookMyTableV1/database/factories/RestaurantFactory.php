@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Restaurateur;
+use App\Models\TypeCuisine;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -14,16 +16,16 @@ class RestaurantFactory extends Factory
      *
      * @return array<string, mixed>
      */
-   public function definition(): array
+    public function definition(): array
     {
         return [
-            'user_id' => User::factory(), 
-            'name' => fake()->company() . ' Restaurant',
-            'description' => fake()->paragraph(),
-            'address' => fake()->address(),
-            'city' => fake()->city(),
-            'phone' => fake()->phoneNumber(),
-            'is_active' => true,
+            'nom_restaurant' => fake()->company(),
+            'adresse_restaurant' => fake()->address(),
+            'telephone_restaurant' => fake()->phoneNumber(),
+            'email_restaurant' => fake()->unique()->safeEmail(),
+            'description_restaurant' => fake()->paragraph(),
+            'type_cuisine_id' => TypeCuisine::factory(),
+            'user_id' => Restaurateur::factory(),
         ];
     }
 }
