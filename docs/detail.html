@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ $restaurant->name }} | BookMyTable</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sticky-sidebar { position: sticky; top: 100px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <nav class="bg-white shadow-sm p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="{{ route('home') }}" class="flex items-center gap-2 text-emerald-600 font-bold text-xl">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            @auth
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium">{{ Auth::user()->name }}</span>
+                    <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 font-bold">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                </div>
+            @else
+                <a href="{{ route('login') }}" class="text-emerald-600 font-medium">Se connecter</a>
+            @endauth
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="h-64 md:h-80 w-full rounded-3xl overflow-hidden mb-8 shadow-xl relative">
+            <img src="https://source.unsplash.com/random/1200x500/?restaurant,interior&sig={{ $restaurant->id }}" 
+                 class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                <div class="text-white">
+                    <h1 class="text-4xl font-bold mb-2">{{ $restaurant->name }}</h1>
+                    <div class="flex items-center gap-4 text-sm">
+                        <span><i class="fas fa-map-marker-alt text-emerald-400 mr-1"></i> {{ $restaurant->address }}, {{ $restaurant->city }}</span>
+                        @foreach($restaurant->categories as $cat)
+                            <span class="bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">{{ $cat->name }}</span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 space-y-8">
+                
+                <div class="bg-white rounded-3xl p-8 shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">À propos</h2>
+                    <p class="text-gray-600 leading-relaxed">{{ $restaurant->description }}</p>
+                </div>
+
+                <div class="bg-white rounded-3xl p-8 shadow-sm">
+                    <h2 class="text-2xl font-bold mb-6">Menu & Carte</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        @forelse($restaurant->menuItems as $item)
+                            <div class="flex justify-between items-start border-b border-gray-100 pb-4">
+                                <div>
+                                    <h3 class="font-bold text-gray-800">{{ $item->name }}</h3>
+                                    <p class="text-sm text-gray-500 mt-1 line-clamp-1">{{ $item->description }}</p>
+                                </div>
+                                <span class="font-bold text-emerald-600 ml-4">{{ $item->price }} Dh</span>
+                            </div>
+                        @empty
+                            <p class="text-gray-500 italic">Menu en cours de mise à jour...</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-8 shadow-sm">
+                    <h2 class="text-2xl font-bold mb-6">Avis Clients ({{ $restaurant->reviews->count() }})</h2>
+                    <div class="space-y-6">
+                        @forelse($restaurant->reviews as $review)
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0 flex items-center justify-center text-gray-500 font-bold">
+                                    {{ substr($review->user->name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-bold">{{ $review->user->name }}</span>
+                                        <div class="flex text-yellow-400 text-xs">
+                                            @for($i=0; $i<$review->rating; $i++) <i class="fas fa-star"></i> @endfor
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 text-sm">{{ $review->comment }}</p>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-gray-500 italic">Aucun avis pour le moment.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="sticky-sidebar">
+                    <div class="bg-white rounded-3xl shadow-xl p-6 border border-emerald-100">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <i class="fas fa-calendar-check text-emerald-600"></i> Réserver une table
+                        </h3>
+
+                        @auth
+                            <form action="{{ route('bookings.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="restaurant_id" value="{{ $restaurant->id }}">
+
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date et Heure</label>
+                                    <input type="datetime-local" name="booking_date" required
+                                           min="{{ date('Y-m-d\TH:i') }}"
+                                           class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de personnes</label>
+                                    <select name="guest_count" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                                        @for($i=1; $i<=10; $i++)
+                                            <option value="{{ $i }}">{{ $i }} Personne(s)</option>
+                                        @endfor
+                                        <option value="12">12 Personnes</option>
+                                        <option value="15">15 Personnes</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-200 transition transform hover:-translate-y-1">
+                                    Confirmer la réservation
+                                </button>
+                                
+                                <p class="text-xs text-center text-gray-400 mt-4">
+                                    <i class="fas fa-lock"></i> Réservation instantanée et sécurisée
+                                </p>
+                            </form>
+                        @else
+                            <div class="text-center py-6">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                                    <i class="fas fa-user-lock text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-4">Connectez-vous pour réserver votre table.</p>
+                                <a href="{{ route('login') }}" class="block w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition">
+                                    Se connecter
+                                </a>
+                            </div>
+                        @endauth
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

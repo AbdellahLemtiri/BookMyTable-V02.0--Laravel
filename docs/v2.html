@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMyTable | Restaurateur Portal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Chart bars */
+        .chart-bar {
+            transition: height 0.3s ease;
+        }
+        
+        /* Kanban columns */
+        .kanban-column {
+            min-height: 500px;
+        }
+        
+        /* Modal animation */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        
+        /* Table row hover */
+        .table-row-hover:hover {
+            background-color: #f8fafc;
+        }
+        
+        /* Loading skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body x-data="dashboard()" x-cloak>
+    <!-- Main Container -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white border-r border-gray-200 flex flex-col">
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-utensils text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-gray-800 text-lg">BookMyTable</h1>
+                        <p class="text-xs text-gray-500">Restaurateur Portal</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Info -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-3">
+                        MR
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Marco Rossi</h3>
+                        <p class="text-sm text-gray-500">La Bella Vista</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="flex-1 p-4">
+                <nav class="space-y-1">
+                    <button @click="activeSection = 'overview'" 
+                            :class="activeSection === 'overview' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'text-gray-700 hover:bg-gray-50 border-transparent'"
+                            class="w-full flex items-center py-3 px-4 rounded-xl border transition-all duration-200 font-medium">
+                        <i class="fas fa-chart-bar mr-3"></i>
+                        Overview
+                    </button>
+                    
+                    <button @click="activeSection = 'restaurants'" 
+                            :class="activeSection === 'restaurants' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'text-gray-700 hover:bg-gray-50 border-transparent'"
+                            class="w-full flex items-center py-3 px-4 rounded-xl border transition-all duration-200 font-medium">
+                        <i class="fas fa-store mr-3"></i>
+                        My Restaurants
+                    </button>
+                    
+                    <button @click="activeSection = 'bookings'" 
+                            :class="activeSection === 'bookings' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'text-gray-700 hover:bg-gray-50 border-transparent'"
+                            class="w-full flex items-center py-3 px-4 rounded-xl border transition-all duration-200 font-medium">
+                        <i class="fas fa-calendar-check mr-3"></i>
+                        Bookings Management
+                    </button>
+                    
+                    <button @click="activeSection = 'reviews'" 
+                            :class="activeSection === 'reviews' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'text-gray-700 hover:bg-gray-50 border-transparent'"
+                            class="w-full flex items-center py-3 px-4 rounded-xl border transition-all duration-200 font-medium">
+                        <i class="fas fa-star mr-3"></i>
+                        Reviews
+                    </button>
+                    
+                    <button @click="activeSection = 'settings'" 
+                            :class="activeSection === 'settings' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'text-gray-700 hover:bg-gray-50 border-transparent'"
+                            class="w-full flex items-center py-3 px-4 rounded-xl border transition-all duration-200 font-medium">
+                        <i class="fas fa-cog mr-3"></i>
+                        Settings
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Bottom Actions -->
+            <div class="p-6 border-t border-gray-200">
+                <button class="w-full flex items-center justify-center py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors duration-200 font-medium">
+                    <i class="fas fa-question-circle mr-2"></i>
+                    Help & Support
+                </button>
+                <button class="w-full flex items-center justify-center py-2.5 px-4 mt-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors duration-200 font-medium">
+                    <i class="fas fa-plus mr-2"></i>
+                    Add Restaurant
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200 px-8 py-5">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800 capitalize" x-text="activeSection.replace('-', ' ')"></h2>
+                        <p class="text-gray-600" x-text="getSectionDescription(activeSection)"></p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Notifications -->
+                        <button class="relative w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-colors duration-200">
+                            <i class="fas fa-bell text-gray-600"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                        
+                        <!-- Date Selector -->
+                        <div class="relative">
+                            <i class="fas fa-calendar-alt absolute left-4 top-3 text-gray-400"></i>
+                            <input type="date" :value="today" class="pl-12 pr-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        
+                        <!-- Quick Stats -->
+                        <div class="hidden md:flex items-center space-x-4">
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Today's Revenue</p>
+                                <p class="font-bold text-gray-800">$2,840</p>
+                            </div>
+                            <div class="h-8 w-px bg-gray-300"></div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Bookings</p>
+                                <p class="font-bold text-gray-800">18/24</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content Area -->
+            <main class="p-8">
+                <!-- Overview Section -->
+                <div x-show="activeSection === 'overview'" x-transition>
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Total Revenue Card -->
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm font-medium">Total Revenue</p>
+                                    <h3 class="text-3xl font-bold text-gray-800 mt-2">$42,580</h3>
+                                    <div class="flex items-center mt-2">
+                                        <span class="text-emerald-600 font-medium">
+                                            <i class="fas fa-arrow-up mr-1"></i> 12.5%
+                                        </span>
+                                        <span class="text-gray-500 text-sm ml-2">from last month</span>
+                                    </div>
+                                </div>
+                                <div class="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-dollar-sign text-emerald-600 text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Active Bookings Today -->
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm font-medium">Active Bookings Today</p>
+                                    <h3 class="text-3xl font-bold text-gray-800 mt-2">18</h3>
+                                    <div class="flex items-center mt-2">
+                                        <span class="text-amber-600 font-medium">
+                                            12 confirmed
+                                        </span>
+                                        <span class="text-gray-500 text-sm ml-2">6 pending</span>
+                                    </div>
+                                </div>
+                                <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-calendar-alt text-blue-600 text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Profile Views -->
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm font-medium">Total Profile Views</p>
+                                    <h3 class="text-3xl font-bold text-gray-800 mt-2">2,847</h3>
+                                    <div class="flex items-center mt-2">
+                                        <span class="text-emerald-600 font-medium">
+                                            <i class="fas fa-arrow-up mr-1"></i> 8.2%
+                                        </span>
+                                        <span class="text-gray-500 text-sm ml-2">from last week</span>
+                                    </div>
+                                </div>
+                                <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-eye text-purple-600 text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Bookings Chart -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 mb-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">Weekly Bookings</h3>
+                                <p class="text-gray-600">Last 7 days booking trends</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-4 py-2 text-sm font-medium bg-emerald-50 text-emerald-700 rounded-lg">Week</button>
+                                <button class="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Month</button>
+                                <button class="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Quarter</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart -->
+                        <div class="flex items-end h-64 pt-8">
+                            <!-- Chart bars -->
+                            <div class="flex-1 flex items-end justify-between">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg chart-bar" style="height: 80%;"></div>
+                                    <span class="mt-2 text-sm text-gray-500">Mon</span>
+                                    <span class="font-semibold text-gray-800">24</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg chart-bar" style="height: 65%;"></div>
+                                    <span class="mt-2 text-sm text-gray-500">Tue</span>
+                                    <span class="font-semibold text-gray-800">19</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg chart-bar" style="height: 90%;"></div>
+                                    <span class="mt-2 text-sm text-gray-500">Wed</span>
+                                    <span class="font-semibold text-gray-800">28</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg chart-bar" style="height: 75%;"></div>
+                                    <span class="mt-2 text-sm text-gray-500">Thu</span>
+                                    <span class="font-semibold text-gray-800">22</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg chart-bar" style="height: 95%;"></div>
+                                    <span class="mt-2 text-sm text-gray-500">Fri</span>
+                                    <span class="font-semibold text-gray-800">30</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg chart-bar" style="height: 100%;"></div>
+                                    <span class="mt-2 text-sm text-gray-500">Sat</span>
+                                    <span class="font-semibold text-gray-800">32</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="w-12 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-lg chart-bar" style="height: 70%;"></div>
+                                    <span class="mt-2 text-sm text-gray-500">Sun</span>
+                                    <span class="font-semibold text-gray-800">21</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">Recent Activity</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-calendar-plus text-emerald-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">New booking received for 8:30 PM</p>
+                                    <p class="text-sm text-gray-500">Table for 4 at La Bella Vista • 10 minutes ago</p>
+                                </div>
+                                <button class="px-4 py-1.5 bg-emerald-50 text-emerald-700 font-medium rounded-lg text-sm">
+                                    View
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-star text-amber-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">New 5-star review from Sarah Johnson</p>
+                                    <p class="text-sm text-gray-500">"Excellent service and food!" • 2 hours ago</p>
+                                </div>
+                                <button class="px-4 py-1.5 bg-gray-100 text-gray-700 font-medium rounded-lg text-sm">
+                                    Respond
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-user-edit text-blue-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Profile updated successfully</p>
+                                    <p class="text-sm text-gray-500">Menu and hours updated • Yesterday</p>
+                                </div>
+                                <button class="px-4 py-1.5 bg-gray-100 text-gray-700 font-medium rounded-lg text-sm">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- My Restaurants Section -->
+                <div x-show="activeSection === 'restaurants'" x-transition>
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">My Restaurants</h3>
+                            <p class="text-gray-600">Manage your restaurant listings and details</p>
+                        </div>
+                        <button @click="openRestaurantModal('add')" 
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 shadow-md">
+                            <i class="fas fa-plus mr-2"></i>Add Restaurant
+                        </button>
+                    </div>
+                    
+                    <!-- Restaurants Table -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="py-4 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+                                        <th class="py-4 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cuisine</th>
+                                        <th class="py-4 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="py-4 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bookings Today</th>
+                                        <th class="py-4 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+                                        <th class="py-4 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <!-- Restaurant 1 -->
+                                    <tr class="table-row-hover">
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <div class="w-12 h-12 rounded-lg overflow-hidden mr-4">
+                                                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                                                         alt="La Bella Vista" class="w-full h-full object-cover">
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-semibold text-gray-800">La Bella Vista</h4>
+                                                    <p class="text-sm text-gray-500">123 Skyline Ave, Downtown</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">Italian</span>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                                <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <span class="font-semibold text-gray-800 mr-2">12</span>
+                                                <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-emerald-500" style="width: 50%;"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-star text-yellow-500 text-sm mr-1"></i>
+                                                <span class="font-semibold">4.8</span>
+                                                <span class="text-gray-500 text-sm ml-1">(124)</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex space-x-2">
+                                                <button @click="openRestaurantModal('edit')" class="w-9 h-9 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="w-9 h-9 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Restaurant 2 -->
+                                    <tr class="table-row-hover">
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <div class="w-12 h-12 rounded-lg overflow-hidden mr-4">
+                                                    <img src="https://images.unsplash.com/photo-1554679665-f5537f187268?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                                                         alt="Sakura Garden" class="w-full h-full object-cover">
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-semibold text-gray-800">Sakura Garden</h4>
+                                                    <p class="text-sm text-gray-500">456 Cherry St, West End</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <span class="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full">Japanese</span>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                                <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <span class="font-semibold text-gray-800 mr-2">8</span>
+                                                <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-emerald-500" style="width: 33%;"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-star text-yellow-500 text-sm mr-1"></i>
+                                                <span class="font-semibold">4.9</span>
+                                                <span class="text-gray-500 text-sm ml-1">(87)</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex space-x-2">
+                                                <button @click="openRestaurantModal('edit')" class="w-9 h-9 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="w-9 h-9 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Restaurant 3 -->
+                                    <tr class="table-row-hover">
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <div class="w-12 h-12 rounded-lg overflow-hidden mr-4">
+                                                    <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                                                         alt="Le Petit Bistro" class="w-full h-full object-cover">
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-semibold text-gray-800">Le Petit Bistro</h4>
+                                                    <p class="text-sm text-gray-500">789 Paris Ave, Historic District</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">French</span>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                                <span class="w-2 h-2 bg-amber-500 rounded-full mr-2"></span>
+                                                Pending
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <span class="font-semibold text-gray-800 mr-2">0</span>
+                                                <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-gray-300" style="width: 0%;"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-star text-yellow-500 text-sm mr-1"></i>
+                                                <span class="font-semibold">4.7</span>
+                                                <span class="text-gray-500 text-sm ml-1">(203)</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-6">
+                                            <div class="flex space-x-2">
+                                                <button @click="openRestaurantModal('edit')" class="w-9 h-9 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="w-9 h-9 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Table Footer -->
+                        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                Showing <span class="font-medium">3</span> of <span class="font-medium">3</span> restaurants
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+                                    Previous
+                                </button>
+                                <button class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-sm font-medium">
+                                    1
+                                </button>
+                                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+                                    2
+                                </button>
+                                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Summary -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <h4 class="font-bold text-gray-800 mb-4">Top Performing Restaurant</h4>
+                            <div class="flex items-center">
+                                <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                                         alt="La Bella Vista" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="font-semibold text-gray-800">La Bella Vista</h5>
+                                    <p class="text-sm text-gray-500 mb-2">Italian • $$$</p>
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <span class="font-bold text-gray-800">$18,240</span>
+                                            <span class="text-sm text-gray-500 ml-2">revenue this month</span>
+                                        </div>
+                                        <span class="text-emerald-600 font-medium">
+                                            <i class="fas fa-arrow-up mr-1"></i> 15.3%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <h4 class="font-bold text-gray-800 mb-4">Quick Actions</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <button class="p-4 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors duration-200">
+                                    <i class="fas fa-edit text-blue-600 text-xl mb-2"></i>
+                                    <p class="font-medium text-gray-800 text-sm">Update Menu</p>
+                                </button>
+                                <button class="p-4 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors duration-200">
+                                    <i class="fas fa-image text-purple-600 text-xl mb-2"></i>
+                                    <p class="font-medium text-gray-800 text-sm">Add Photos</p>
+                                </button>
+                                <button class="p-4 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors duration-200">
+                                    <i class="fas fa-clock text-amber-600 text-xl mb-2"></i>
+                                    <p class="font-medium text-gray-800 text-sm">Adjust Hours</p>
+                                </button>
+                                <button class="p-4 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors duration-200">
+                                    <i class="fas fa-chart-line text-emerald-600 text-xl mb-2"></i>
+                                    <p class="font-medium text-gray-800 text-sm">View Analytics</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bookings Management Section -->
+                <div x-show="activeSection === 'bookings'" x-transition>
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Bookings Management</h3>
+                            <p class="text-gray-600">Manage incoming reservations and table assignments</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors duration-200">
+                                <i class="fas fa-download mr-2"></i>Export
+                            </button>
+                            <button class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors duration-200">
+                                <i class="fas fa-filter mr-2"></i>Filters
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Kanban Board -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Pending Column -->
+                        <div class="kanban-column bg-white rounded-xl shadow-md p-5 border border-gray-100">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Pending</h4>
+                                    <p class="text-sm text-gray-500">Awaiting confirmation</p>
+                                </div>
+                                <span class="bg-amber-100 text-amber-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">6</span>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- Booking Card 1 -->
+                                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 4</h5>
+                                            <p class="text-sm text-gray-600">John & Sarah • Anniversary</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-amber-700 px-2 py-1 rounded">8:30 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>Today, June 15</span>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button @click="acceptBooking(1)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-check mr-1"></i> Accept
+                                        </button>
+                                        <button @click="rejectBooking(1)" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-times mr-1"></i> Reject
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Booking Card 2 -->
+                                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 2</h5>
+                                            <p class="text-sm text-gray-600">Michael Chen</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-amber-700 px-2 py-1 rounded">7:00 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>Today, June 15</span>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button @click="acceptBooking(2)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-check mr-1"></i> Accept
+                                        </button>
+                                        <button @click="rejectBooking(2)" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-times mr-1"></i> Reject
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Booking Card 3 -->
+                                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 6</h5>
+                                            <p class="text-sm text-gray-600">Business Meeting</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-amber-700 px-2 py-1 rounded">6:00 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>Tomorrow, June 16</span>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button @click="acceptBooking(3)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-check mr-1"></i> Accept
+                                        </button>
+                                        <button @click="rejectBooking(3)" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-times mr-1"></i> Reject
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Confirmed Column -->
+                        <div class="kanban-column bg-white rounded-xl shadow-md p-5 border border-gray-100">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Confirmed</h4>
+                                    <p class="text-sm text-gray-500">Today's reservations</p>
+                                </div>
+                                <span class="bg-emerald-100 text-emerald-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">12</span>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- Booking Card 1 -->
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 2</h5>
+                                            <p class="text-sm text-gray-600">Robert Johnson</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-emerald-700 px-2 py-1 rounded">7:30 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>Today, June 15</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center mr-2">
+                                                <i class="fas fa-check text-white text-xs"></i>
+                                            </div>
+                                            <span class="text-sm font-medium text-emerald-700">Confirmed</span>
+                                        </div>
+                                        <button class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Booking Card 2 -->
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 4</h5>
+                                            <p class="text-sm text-gray-600">Emily Wilson • Birthday</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-emerald-700 px-2 py-1 rounded">8:00 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>Today, June 15</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center mr-2">
+                                                <i class="fas fa-check text-white text-xs"></i>
+                                            </div>
+                                            <span class="text-sm font-medium text-emerald-700">Confirmed</span>
+                                        </div>
+                                        <button class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Booking Card 3 -->
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 8</h5>
+                                            <p class="text-sm text-gray-600">Corporate Event</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-emerald-700 px-2 py-1 rounded">9:00 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>Today, June 15</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center mr-2">
+                                                <i class="fas fa-check text-white text-xs"></i>
+                                            </div>
+                                            <span class="text-sm font-medium text-emerald-700">Confirmed</span>
+                                        </div>
+                                        <button class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Completed Column -->
+                        <div class="kanban-column bg-white rounded-xl shadow-md p-5 border border-gray-100">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Completed</h4>
+                                    <p class="text-sm text-gray-500">Past 7 days</p>
+                                </div>
+                                <span class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center">42</span>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- Booking Card 1 -->
+                                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 2</h5>
+                                            <p class="text-sm text-gray-600">David Miller</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-blue-700 px-2 py-1 rounded">8:00 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>June 14</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="flex-1">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-star text-yellow-500 text-sm mr-1"></i>
+                                                <span class="font-medium text-gray-800">5.0</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1">"Excellent service!"</p>
+                                        </div>
+                                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                            Details
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Booking Card 2 -->
+                                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 4</h5>
+                                            <p class="text-sm text-gray-600">Family Dinner</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-blue-700 px-2 py-1 rounded">7:30 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>June 13</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="flex-1">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-star text-yellow-500 text-sm mr-1"></i>
+                                                <span class="font-medium text-gray-800">4.5</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1">"Great food!"</p>
+                                        </div>
+                                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                            Details
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Booking Card 3 -->
+                                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 class="font-semibold text-gray-800">Table for 6</h5>
+                                            <p class="text-sm text-gray-600">Business Lunch</p>
+                                        </div>
+                                        <span class="text-xs font-medium bg-white text-blue-700 px-2 py-1 rounded">1:00 PM</span>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <i class="far fa-calendar mr-2"></i>
+                                        <span>June 12</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="flex-1">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-star text-yellow-500 text-sm mr-1"></i>
+                                                <span class="font-medium text-gray-800">4.0</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1">No review yet</p>
+                                        </div>
+                                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                            Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table View (Alternative) -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="font-bold text-gray-800">All Bookings</h4>
+                            <div class="flex items-center space-x-2">
+                                <button class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg text-sm">
+                                    <i class="fas fa-list mr-2"></i>List View
+                                </button>
+                                <button class="px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg text-sm">
+                                    <i class="fas fa-columns mr-2"></i>Kanban View
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guests</th>
+                                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr class="table-row-hover">
+                                        <td class="py-3 px-4">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 rounded-full bg-gray-200 mr-3"></div>
+                                                <div>
+                                                    <p class="font-medium text-gray-800">Sarah Johnson</p>
+                                                    <p class="text-sm text-gray-500">sarah@email.com</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <p class="font-medium text-gray-800">Today, 8:30 PM</p>
+                                            <p class="text-sm text-gray-500">Table 12</p>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <span class="font-medium text-gray-800">4 guests</span>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                                Pending
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="flex space-x-2">
+                                                <button @click="acceptBooking(1)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                    Accept
+                                                </button>
+                                                <button @click="rejectBooking(1)" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                    Reject
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-row-hover">
+                                        <td class="py-3 px-4">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 rounded-full bg-gray-200 mr-3"></div>
+                                                <div>
+                                                    <p class="font-medium text-gray-800">Michael Chen</p>
+                                                    <p class="text-sm text-gray-500">michael@email.com</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <p class="font-medium text-gray-800">Today, 7:00 PM</p>
+                                            <p class="text-sm text-gray-500">Table 8</p>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <span class="font-medium text-gray-800">2 guests</span>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                                Pending
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="flex space-x-2">
+                                                <button @click="acceptBooking(2)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                    Accept
+                                                </button>
+                                                <button @click="rejectBooking(2)" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                    Reject
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other Sections Placeholder -->
+                <div x-show="activeSection === 'reviews'" x-transition>
+                    <div class="text-center py-12">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-star text-yellow-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Reviews Management</h3>
+                        <p class="text-gray-600 mb-8">View and respond to customer reviews (Coming Soon)</p>
+                        <button class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors duration-200">
+                            Explore Reviews
+                        </button>
+                    </div>
+                </div>
+                
+                <div x-show="activeSection === 'settings'" x-transition>
+                    <div class="text-center py-12">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-cog text-gray-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Account Settings</h3>
+                        <p class="text-gray-600 mb-8">Manage your account preferences and notifications (Coming Soon)</p>
+                        <button class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors duration-200">
+                            Go to Settings
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Restaurant Modal -->
+    <div x-show="restaurantModalOpen" x-transition.opacity class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-black bg-opacity-50" @click="restaurantModalOpen = false"></div>
+            
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto" @click.stop>
+                <!-- Header -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800" x-text="restaurantModalMode === 'add' ? 'Add New Restaurant' : 'Edit Restaurant'"></h2>
+                        <p class="text-gray-600">Fill in the details below</p>
+                    </div>
+                    <button @click="restaurantModalOpen = false" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors duration-200">
+                        <i class="fas fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <!-- Form -->
+                <div class="p-6 overflow-y-auto max-h-[70vh]">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div class="space-y-6">
+                            <!-- Restaurant Name -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Restaurant Name *</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g., La Bella Vista" value="La Bella Vista">
+                            </div>
+                            
+                            <!-- Description -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Description *</label>
+                                <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Describe your restaurant...">Fine dining with panoramic city views and authentic Italian cuisine.</textarea>
+                            </div>
+                            
+                            <!-- Cuisine Type -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Cuisine Type *</label>
+                                <select class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option>Select cuisine</option>
+                                    <option selected>Italian</option>
+                                    <option>French</option>
+                                    <option>Japanese</option>
+                                    <option>American</option>
+                                    <option>Mexican</option>
+                                    <option>Indian</option>
+                                    <option>Chinese</option>
+                                    <option>Mediterranean</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Price Range -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Price Range</label>
+                                <div class="flex space-x-2">
+                                    <button class="flex-1 py-3 border border-gray-300 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-colors duration-200">$</button>
+                                    <button class="flex-1 py-3 border border-gray-300 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-colors duration-200">$$</button>
+                                    <button class="flex-1 py-3 border border-gray-300 rounded-xl bg-emerald-50 border-emerald-500 text-emerald-700">$$$</button>
+                                    <button class="flex-1 py-3 border border-gray-300 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-colors duration-200">$$$$</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column -->
+                        <div class="space-y-6">
+                            <!-- Opening Hours -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Opening Hours *</label>
+                                <div class="space-y-3">
+                                    <div class="flex items-center">
+                                        <span class="w-20 text-gray-600">Monday</span>
+                                        <input type="time" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg" value="17:00">
+                                        <span class="mx-2 text-gray-400">to</span>
+                                        <input type="time" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg" value="23:00">
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="w-20 text-gray-600">Tuesday</span>
+                                        <input type="time" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg" value="17:00">
+                                        <span class="mx-2 text-gray-400">to</span>
+                                        <input type="time" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg" value="23:00">
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="w-20 text-gray-600">Wednesday</span>
+                                        <input type="time" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg" value="17:00">
+                                        <span class="mx-2 text-gray-400">to</span>
+                                        <input type="time" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg" value="23:00">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Upload Photos -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Restaurant Photos</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
+                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl"></i>
+                                    </div>
+                                    <p class="text-gray-600 mb-2">Drag & drop or click to upload</p>
+                                    <p class="text-sm text-gray-500 mb-4">Recommended: 1200x800px, JPG or PNG</p>
+                                    <button class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors duration-200">
+                                        Browse Files
+                                    </button>
+                                </div>
+                                
+                                <!-- Uploaded Images Preview -->
+                                <div class="grid grid-cols-3 gap-2 mt-4">
+                                    <div class="h-24 bg-gray-100 rounded-lg overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="h-24 bg-gray-100 rounded-lg overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="h-24 bg-gray-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-plus text-gray-400 text-2xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="mt-6">
+                        <label class="block text-gray-700 font-medium mb-2">Address *</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Full address" value="123 Skyline Ave, Downtown">
+                    </div>
+                    
+                    <!-- Contact Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Phone Number *</label>
+                            <input type="tel" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="+1 (555) 123-4567" value="+1 (555) 123-4567">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Email Address *</label>
+                            <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="contact@restaurant.com" value="info@labellevista.com">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                    <button @click="restaurantModalOpen = false" class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors duration-200">
+                        Cancel
+                    </button>
+                    <button @click="saveRestaurant()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-colors duration-200">
+                        <span x-text="restaurantModalMode === 'add' ? 'Add Restaurant' : 'Save Changes'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Notification -->
+    <div x-show="showNotification" x-transition.opacity class="fixed top-4 right-4 z-50">
+        <div class="bg-white rounded-xl shadow-lg p-4 border-l-4 border-emerald-500 max-w-sm">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-check text-emerald-600"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-800" x-text="notificationTitle"></h4>
+                    <p class="text-sm text-gray-600" x-text="notificationMessage"></p>
+                </div>
+                <button @click="showNotification = false" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alpine.js Application Script -->
+    <script>
+        function dashboard() {
+            return {
+                // State
+                activeSection: 'overview',
+                restaurantModalOpen: false,
+                restaurantModalMode: 'add', // 'add' or 'edit'
+                showNotification: false,
+                notificationTitle: '',
+                notificationMessage: '',
+                today: new Date().toISOString().split('T')[0],
+                
+                // Methods
+                getSectionDescription(section) {
+                    const descriptions = {
+                        'overview': 'View your restaurant performance and key metrics',
+                        'restaurants': 'Manage your restaurant listings and details',
+                        'bookings': 'Handle incoming reservations and table assignments',
+                        'reviews': 'View and respond to customer feedback',
+                        'settings': 'Manage your account preferences and notifications'
+                    };
+                    return descriptions[section] || '';
+                },
+                
+                openRestaurantModal(mode) {
+                    this.restaurantModalMode = mode;
+                    this.restaurantModalOpen = true;
+                },
+                
+                saveRestaurant() {
+                    this.restaurantModalOpen = false;
+                    this.showNotification = true;
+                    this.notificationTitle = this.restaurantModalMode === 'add' ? 'Restaurant Added' : 'Changes Saved';
+                    this.notificationMessage = this.restaurantModalMode === 'add' ? 
+                        'Your restaurant has been added successfully.' : 
+                        'Restaurant details have been updated successfully.';
+                    
+                    // Hide notification after 5 seconds
+                    setTimeout(() => {
+                        this.showNotification = false;
+                    }, 5000);
+                },
+                
+                acceptBooking(bookingId) {
+                    this.showNotification = true;
+                    this.notificationTitle = 'Booking Accepted';
+                    this.notificationMessage = 'The reservation has been confirmed successfully.';
+                    
+                    // Hide notification after 5 seconds
+                    setTimeout(() => {
+                        this.showNotification = false;
+                    }, 5000);
+                    
+                    // In a real app, you would update the booking status via API
+                    console.log(`Booking ${bookingId} accepted`);
+                },
+                
+                rejectBooking(bookingId) {
+                    this.showNotification = true;
+                    this.notificationTitle = 'Booking Rejected';
+                    this.notificationMessage = 'The reservation has been declined.';
+                    
+                    // Hide notification after 5 seconds
+                    setTimeout(() => {
+                        this.showNotification = false;
+                    }, 5000);
+                    
+                    // In a real app, you would update the booking status via API
+                    console.log(`Booking ${bookingId} rejected`);
+                }
+            };
+        }
+    </script>
+</body>
+</html>
