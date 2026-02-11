@@ -25,6 +25,10 @@ Route::middleware('auth')->prefix('auth')->group(function () {
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 });
+
+
+
+
 Route::middleware('client')->prefix('client')->group(function () {
     Route::get('/home', [HomeConteroller::class, 'index'])->name('home');
     Route::post('/home', [HomeConteroller::class, 'search'])->name('home.search');
