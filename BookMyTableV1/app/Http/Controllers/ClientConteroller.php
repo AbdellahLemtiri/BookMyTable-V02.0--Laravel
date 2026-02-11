@@ -23,24 +23,37 @@ class ClientConteroller extends Controller
             return redirect()->back()->with('error', 'Action non autorisée.');
         } 
     }
-    public function storefavori(Request $request)
-    {
-        $request->validate([
-            // 'user_id' => 'required|exists:users,id',
-            'restaurant_id' => 'required|exists:restaurants,id',
-        ]);
+ 
+    // public function storefavori(Request $request)
+    // {
+    //     $client = Auth()->user();
+    //     $restuarant  = $client->restuarants->toggle($request->restaurant_id);
+    //     if($client->load('restuarants')->contains($request->restaurant_id)){
+    //         return back()->with('success', 'Restaurant ajouté aux favoris.');
+    //     }
+    //     else{
+    //         return back()->with('success', 'Restaurant retiré des favoris.');
+    //     }
 
-        if (auth()->check() && auth()->user()->role === 'client') {
-            $client = Client::find(auth()->id());
-            $restaurant = Restaurant::find($request->restaurant_id);
-            $client->restaurants()->toggle($restaurant->id);
-            if ($client->restaurants->contains($restaurant->id)) {
-                return redirect()->back()->with('success', 'Restaurant ajouter avec succès.');
-            } else {
-                return redirect()->back()->with('success', 'Restaurant supprimé avec succès.');
-            }
-        } else {
-            return redirect()->back()->with('error', 'Action non autorisée.');
-        }
-    }
+    // }
+
+    public function storefavori(Request $request)
+{
+    $request->validate([
+        'restaurant_id' => 'required|exists:restaurants,id',
+    ]);
+
+    $client = auth()->user();
+
+    $client->restaurants()->toggle($request->restaurant_id);
+
+    $client->load('restaurants');
+
+    $message = $client->restaurants->contains($request->restaurant_id)
+        ? 'Restaurant ajouté aux favoris.'
+        : 'Restaurant retiré des favoris.';
+
+    return back()->with('success', $message);
+}
+
 }

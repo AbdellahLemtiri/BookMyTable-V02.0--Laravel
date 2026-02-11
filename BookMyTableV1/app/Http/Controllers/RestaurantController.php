@@ -36,7 +36,7 @@ class RestaurantController extends Controller
      */
     public function store(StoreRestaurantRequest $request)
     {
-        $validated = $request->validated(); 
+        $validated = $request->validated();
 
         try {
             return DB::transaction(function () use ($validated, $request) {
@@ -206,4 +206,9 @@ class RestaurantController extends Controller
                 ->with('error', 'Erreur lors de la suppression: ' . $e->getMessage());
         }
     }
+
+
+
 }
+
+

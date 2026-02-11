@@ -13,6 +13,14 @@ class HomeConteroller extends Controller
     public function index()
     {
         $restaurants = Restaurant::with('typeCuisine')->latest()->get();
+        $client = auth()->user();
+        $client->load('restaurants');
+        foreach ($restaurants as $restaurant) {
+            if($client->restaurants->id = $restaurant->id)
+                {
+                    $restaurant->is_liked = true;
+                }
+        }
         return view('home', compact('restaurants'));
     }
 
@@ -31,7 +39,7 @@ class HomeConteroller extends Controller
         }
 
         $restaurants = $query->get(); //latest()->get();
-
+        $client = auth()->user();
         return view('home', compact('restaurants'));
     }
 }
