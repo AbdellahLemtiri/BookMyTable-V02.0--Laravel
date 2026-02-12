@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Models\Restaurant;
 
 class ReservationController extends Controller
 {
@@ -18,9 +19,11 @@ class ReservationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create( )
     {
         //
+        $restaurant = Restaurant::findOrFail($restaurant_id);
+        return view('reservations.create', compact('restaurant'));
     }
 
     /**
