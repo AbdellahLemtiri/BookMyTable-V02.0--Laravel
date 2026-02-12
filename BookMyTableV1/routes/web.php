@@ -8,6 +8,7 @@ use App\Http\Controllers\HoraireController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\ReservationController;
 use App\Models\Admin;
 use App\Models\Client;
 use App\Models\Restaurant;
@@ -34,6 +35,7 @@ Route::middleware('client')->prefix('client')->group(function () {
     Route::post('/home', [HomeConteroller::class, 'search'])->name('home.search');
     Route::post('/home/favori', [ClientConteroller::class, 'storefavori'])->name('home.like');
     Route::get('/home/favoris', [ClientConteroller::class, 'mesFavoris'])->name('client.favoris');
+    Route::post('restaurants/restaurant_id',[ReservationController::class,'creat'])->name('reservations.store');
     Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('client.restaurant.show');
 });
 
