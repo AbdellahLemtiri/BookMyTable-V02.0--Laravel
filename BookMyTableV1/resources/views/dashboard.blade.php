@@ -46,7 +46,7 @@
                                             </svg>
                                         </a>
                                         @role('restaurateur')
-                                            <button onclick="openDeleteModal({{ $restaurant->id }}, '{{ $restaurant->nom_restaurant }}')"
+                                            <button onclick="openDeleteModal({{ $restaurant->id }} , '{{ $restaurant->nom_restaurant }}')"
                                                 class="text-gray-600 hover:text-red-500 transition-colors">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
