@@ -5,24 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
 class HomeConteroller extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $restaurants = Restaurant::with('typeCuisine')->latest()->get();
-        $client = auth()->user();
+  public function index()
+{
+    $restaurants = Restaurant::with('typeCuisine')->latest()->get();
+    $client = auth()->user();
+
+    if ($client) {
         $client->load('restaurants');
+
         foreach ($restaurants as $restaurant) {
-            if($client->restaurants->id = $restaurant->id)
-                {
-                    $restaurant->is_liked = true;
-                }
+            $restaurant->is_liked = $client->restaurants->contains($restaurant->id);
         }
-        return view('home', compact('restaurants'));
     }
+
+    return view('home', compact('restaurants'));
+}
+
 
     /** 
      * Search restaurants based on criteria.
