@@ -35,11 +35,20 @@ Route::middleware('client')->prefix('client')->group(function () {
     Route::post('/home', [HomeConteroller::class, 'search'])->name('home.search');
     Route::post('/home/favori', [ClientConteroller::class, 'storefavori'])->name('home.like');
     Route::get('/home/favoris', [ClientConteroller::class, 'mesFavoris'])->name('client.favoris');
-    Route::post('restaurants/restaurant_id',[ReservationController::class,'creat'])->name('reservations.store');
+    Route::post('restaurants/', [ReservationController::class, 'store'])->name('reservations.store');
     Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('client.restaurant.show');
+    Route::get('/home/reservations', [ReservationController::class, 'history'])->name('reservations.history');
 });
 
 
+Route::middleware(['auth'])->group(function () {
+
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+
+    Route::get('/reservations/success/{reservation_id}', [ReservationController::class, 'success'])->name('reservations.success');
+
+    Route::get('/reservations/cancel/{reservation_id}', [ReservationController::class, 'cancel'])->name('reservations.cancel');
+});
 
 
 
