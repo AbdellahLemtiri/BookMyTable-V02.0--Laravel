@@ -21,7 +21,7 @@
                     <a href="{{ route('client.favoris') }}"
                         class="text-[10px] font-black uppercase tracking-[3px] text-orange-500 hover:text-white transition-all">Mes
                         Favoris</a>
-                    <a href="#"
+                    <a href="{{route('reservations.history')}}"
                         class="text-[10px] font-black uppercase tracking-[3px] text-orange-500 hover:text-white transition-all">Mes
                         Réservations</a>
                 @endrole
